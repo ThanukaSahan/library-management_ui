@@ -1,5 +1,5 @@
 .login-container{    
-    margin: 100px;
+    margin: 100px 100px 50px 100px;
     padding: 20px;
     border: 1px solid #482a2a;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 15); 
@@ -34,8 +34,8 @@ form{
     padding:0 50px;
 }
 
-h2{
-    align-items: center;
+.loginOrsignup{
+    text-align: center;
 }
 
 .formBottom{
@@ -55,4 +55,8 @@ button {
     color: white;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.btn-group{
+    width: 180px;
 }
