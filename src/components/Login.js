@@ -1,14 +1,16 @@
 import "../css/logincss.css";
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const Login = () => {
+const Login = ({ onLogin }) => {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState(false);
   const [erroMessage, setErroMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isLogin, setIsLogin] = useState(true);
-
+  const [isSuccess, setIsSuccess] = useState(false);
   const [newusername, setNewUserName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lasttName, setLasttName] = useState("");
@@ -16,10 +18,10 @@ const Login = () => {
   const [address, setAddress] = useState("");
   const [newpassword, setNewpassword] = useState("");
   const [reconfirmpassword, setreconfirmpassword] = useState("");
+  const navigator = useNavigate("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(`${process.env.REACT_APP_API_BASE_URL}`);
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/auth/login`,
@@ -31,6 +33,8 @@ const Login = () => {
 
       setLoginError(false);
       localStorage.setItem("token", response.data.access_token);
+      onLogin();
+      navigator("/");
     } catch (error) {
       if (error.response) {
         console.error("Error Data:", error.response.data);
@@ -43,8 +47,58 @@ const Login = () => {
     }
   };
 
-  const handleNewUser = async (e) => {};
+  const handleNewUser = async (e) => {
+    e.preventDefault();
+    setIsSuccess(false);
+    setLoginError(false);
+    if (!passwordValidation()) {
+      return;
+    }
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/users/createUser`,
+        {
+          userName: newusername,
+          password: newpassword,
+          firstName: firstName,
+          lasttName: lasttName,
+          mobileNo: "+" + mobileNo,
+          address: address,
+          isActive: true,
+          role: "",
+        }
+      );
 
+      if (response.data) {
+        setIsLogin(true);
+        setIsSuccess(true);
+        setSuccessMessage("Your Account Has Been Credited!!! Happy Reading");
+      }
+    } catch (error) {
+      setLoginError(true);
+      if (error.response) {
+        /*console.error("Error Data:", error.response.data);
+        console.error("Error Status:", error.response.status);*/
+        setErroMessage(error.response.data.message);
+      } else {
+        /* console.error("Error:", error.message);*/
+        setErroMessage(error.message);
+      }
+    }
+  };
+
+  const confirmPasswordValidation = async (e) => {
+    setLoginError(false);
+    e.preventDefault();
+    passwordValidation();
+  };
+  const passwordValidation = async (e) => {
+    if (newpassword !== reconfirmpassword) {
+      setLoginError(true);
+      setErroMessage("Passwords do not match. Please try again.");
+    }
+    return false;
+  };
   return (
     <div>
       <div className="login-background">
@@ -161,8 +215,9 @@ const Login = () => {
                   <label>Confirm Password:</label>
                   <input
                     type="password"
-                    value={newpassword}
-                    onChange={(e) => setNewpassword(e.target.value)}
+                    value={reconfirmpassword}
+                    onChange={(e) => setreconfirmpassword(e.target.value)}
+                    onBlur={confirmPasswordValidation}
                     required
                   ></input>
                 </div>
@@ -175,6 +230,11 @@ const Login = () => {
           {loginError && (
             <div className="alert alert-danger error-container" role="alert">
               {erroMessage}
+            </div>
+          )}
+          {isSuccess && (
+            <div className="alert alert-primary error-container" role="alert">
+              {successMessage}
             </div>
           )}
         </div>

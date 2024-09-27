@@ -1,0 +1,57 @@
+/* Container for the sidebar */
+.sidebar {
+    position: fixed;
+    left: -250px; /* Sidebar starts off-screen */
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #333;
+    color: white;
+    transition: left 0.3s;
+    padding-top: 20px;
+    z-index: 1000; /* Ensures sidebar stays on top of other elements */
+  }
+  
+  /* Sidebar visible state */
+  .sidebar.open {
+    left: 0; /* Moves the sidebar into view */
+  }
+  
+  /* Toggle button styling */
+  .toggle-btn {
+    position: fixed; /* Fixes the button to the sidebar */
+    top: 20px; /* Positions the button from the top */
+    left: 250px; /* Aligns with the sidebar when open */
+    padding: 10px;
+    background-color: #444;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: left 0.3s;
+    z-index: 1100; /* Ensures the button is always on top */
+  }
+  
+  /* When the sidebar is open, adjust the button position */
+  .sidebar.open .toggle-btn {
+    left: 250px;
+  }
+  
+  /* Sidebar menu styling */
+  .menu {
+    list-style: none;
+    padding: 0;
+    margin-top: 50px; /* Space between top and menu items */
+  }
+  
+  /* Individual menu item styling */
+  .menu li {
+    padding: 15px 10px;
+    border-bottom: 1px solid #555;
+    cursor: pointer;
+  }
+  
+  /* Menu item hover effect */
+  .menu li:hover {
+    background-color: #555;
+  }
+  
