@@ -3,38 +3,40 @@ import {
   Route,
   Navigate,
   Routes,
+  useNavigate,
 } from "react-router-dom";
 import "./App.css";
 import Login from "./components/Login";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MasterPage from "./components/MasterPage";
 
 function App() {
   const [isAuthenticated, setisAuthenticated] = useState(false);
 
+  useEffect(() => {
+    const authStatus = localStorage.getItem("isAuthenticated");
+    if (authStatus === "true") {
+      setisAuthenticated(true);
+    }
+  }, []);
+
   const handleLogin = () => {
     setisAuthenticated(true);
+    localStorage.setItem("isAuthenticated", "true");
   };
   return (
     <div>
       <Router>
         {isAuthenticated ? (
           <>
-            <MasterPage></MasterPage>
+            <MasterPage />
           </>
         ) : (
           <>
-            <Routes>
-              <Route
-                path="/login"
-                element={<Login onLogin={handleLogin}></Login>}
-              />
-              <Route path="*" element={<Navigate to="/login" />} />
-            </Routes>
+            <Login onLogin={handleLogin} />
           </>
         )}
-        ;
       </Router>
     </div>
   );

@@ -2,15 +2,19 @@ import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import { Navigate, Route, Router, Routes } from "react-router-dom";
 import Home from "./Home";
+import Author from "./Author";
 const MasterPage = () => {
   return (
-    <div>
-      <Sidebar></Sidebar>
-
-      <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="*" element={<Navigate to="Home /" />}></Route>
-      </Routes>
+    <div className="flex flex-row space-x-4">
+      <div className="rounded">
+        <Sidebar></Sidebar>
+      </div>
+      <div className="p-1 rounded my-2 w-full">
+        <Routes>
+          <Route path="/" element={<Home />}></Route>
+          <Route path="author" element={<Author />}></Route>
+        </Routes>
+      </div>
     </div>
   );
 };

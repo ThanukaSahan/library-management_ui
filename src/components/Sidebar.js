@@ -1,27 +1,92 @@
-import React, { useState } from "react";
+// src/Sidebar.js
 import "../css/Sidebar.css";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 
 const Sidebar = () => {
+  const [userRole, setUserRole] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [openSubMenu, setOpenSubMenu] = useState(null);
+  const menuItems = [
+    { name: "Home", path: "/" },
+    {
+      name: "Master",
+      path: "#",
+      subMenu: [
+        { name: "Author", path: "/author" },
+        {
+          name: "Category",
+          path: "#",
+        },
+        { name: "Publisher", path: "#" },
+      ],
+    },
+    { name: "Settings", path: "#" },
+    { name: "Logout", path: "#" },
+  ];
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
+  const handleSubmenuToggle = (index) => {
+    if (openSubMenu == index) {
+      setOpenSubMenu(null);
+    } else {
+      setOpenSubMenu(index);
+    }
   };
-
   return (
-    <div className={`sidebar ${isOpen ? "open" : ""}`}>
-      <button className="toggle-btn" onClick={toggleSidebar}>
-        {isOpen ? "Close" : "Open"}
-      </button>
-      <ul className="menu">
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>About</li>
-        <li>Services</li>
-        <li>Contact</li>
-      </ul>
+    <div className="flex text-left">
+      <div
+        className={`bg-gray-800 text-white w-64  h-screen space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform ${
+          isOpen ? "-translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0 transition duration-200 ease-in-out`}
+      >
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="text-white hover:text-Red focus:outline-none  absolute top-2 right-2 bg-gray-800 hover:bg-gray-700 w-11"
+        >
+          {isOpen ? "<<" : ">>"}
+        </button>
+
+        <h1 className="text-2xl font-semibold text-center">My App</h1>
+
+        <nav>
+          {menuItems.map((item, index) => (
+            <div key={index}>
+              <a
+                href={item.path}
+                onClick={(e) => {
+                  if (item.subMenu) {
+                    e.preventDefault();
+                    handleSubmenuToggle(index);
+                  }
+                }}
+                className={`text-left flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-white no-underline ${
+                  isOpen ? "justify-left" : "justify-left"
+                }`}
+              >
+                {item.name}
+              </a>
+              {item.subMenu && openSubMenu === index && isOpen && (
+                <div className="ml-8 space-y-2">
+                  {item.subMenu.map((subItem, subIndex) => (
+                    <a
+                      href={subItem.path}
+                      key={subIndex}
+                      className="block py-1 px-2 rounded transition duration-200 hover:bg-gray-600 text-white no-underline"
+                    >
+                      {subItem.name}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </nav>
+      </div>
+      <div
+        className="flex-1 h-screen" // Ensures the content area matches the sidebar's height
+        onClick={() => setIsOpen(false)} // Optional: Click outside to collapse
+      >
+        {/* Content goes here */}
+      </div>
     </div>
   );
 };
