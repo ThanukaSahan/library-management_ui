@@ -2,6 +2,7 @@ import "../css/logincss.css";
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import JWTService from "../common/JWTService ";
 
 const Login = ({ onLogin }) => {
   const [username, setUserName] = useState("");
@@ -32,7 +33,7 @@ const Login = ({ onLogin }) => {
       );
 
       setLoginError(false);
-      localStorage.setItem("token", response.data.access_token);
+      JWTService.setToken(response.data.access_token);
       onLogin();
       navigator("/");
     } catch (error) {

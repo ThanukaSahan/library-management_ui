@@ -1,5 +1,11 @@
+import { faEye } from "@fortawesome/free-regular-svg-icons";
+import { faPen } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import JWTService from "../common/JWTService ";
+import { useNavigate } from "react-router-dom";
+
 const Author = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -7,11 +13,17 @@ const Author = () => {
   const [bography, setBiography] = useState("");
   const [nationality, setNationality] = useState("");
   const [authorDetails, setAuthorDetails] = useState([]);
-
-  useEffect(() => {
-    loadAuthorDetails();
+  const [image64, setImage64] = useState({
+    myFile: "",
   });
-  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!JWTService.pageAccess("Admin,Manager")) {
+      navigate("/");
+    }
+    loadAuthorDetails();
+  }, []);
+  const token = JWTService.getToken();
   const loadAuthorDetails = async (e) => {
     try {
       const response = await axios.get(
@@ -35,6 +47,7 @@ const Author = () => {
   };
 
   const handleSaveNew = async (e) => {
+    debugger;
     e.preventDefault();
     try {
       const response = await axios.post(
@@ -46,6 +59,7 @@ const Author = () => {
           Biography: bography,
           Nationality: nationality,
           CreateUser: "",
+          Image: image64.myFile,
         },
         {
           headers: {
@@ -65,6 +79,39 @@ const Author = () => {
     }
   };
 
+  const handleUpdateImage = async (e) => {
+    debugger;
+    const file = e.target.files[0];
+    if (file) {
+      const fileSizeInMB = file.size / (1024 * 1024); // Convert bytes to MB
+      const maxSize = 4.8;
+
+      if (fileSizeInMB > maxSize) {
+        alert("File size exceeds 5MB. Please choose a smaller file.");
+        return;
+      } else {
+        const base64 = await convertToBase64(file);
+        setImage64({ ...image64, myFile: base64 });
+      }
+    }
+  };
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+
+  const handleViewAuthor = async (id) => {
+    debugger;
+  };
   return (
     <div>
       <div>
@@ -123,7 +170,16 @@ const Author = () => {
               ></textarea>
             </div>
 
-            <div className="w-1/2"></div>
+            <div className="w-1/2">
+              <label>Upload Image</label>
+              <input
+                type="file"
+                label="Image"
+                name="myFile"
+                accept=".jpeg, .png, .jpg"
+                onChange={(e) => handleUpdateImage(e)}
+              />
+            </div>
           </div>
         </div>
         <div className=" flex w-1/5 mt-4 space-x-3">
@@ -154,7 +210,18 @@ const Author = () => {
                 <td value={index}>{item.Name}</td>
                 <td value={index}>{item.Email}</td>
                 <td value={index}>{item.Website}</td>
-                <td>MoreDetails... Edit..</td>
+                <td>
+                  <FontAwesomeIcon
+                    icon={faEye}
+                    className="w-1/2"
+                    onClick={() => handleViewAuthor(item._id)}
+                  />
+                  <FontAwesomeIcon
+                    icon={faPen}
+                    className="w-1/2"
+                    values={item.id}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>

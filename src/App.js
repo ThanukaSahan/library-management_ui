@@ -15,7 +15,7 @@ function App() {
   const [isAuthenticated, setisAuthenticated] = useState(false);
 
   useEffect(() => {
-    const authStatus = localStorage.getItem("isAuthenticated");
+    const authStatus = sessionStorage.getItem("isAuthenticated");
     if (authStatus === "true") {
       setisAuthenticated(true);
     }
@@ -23,7 +23,7 @@ function App() {
 
   const handleLogin = () => {
     setisAuthenticated(true);
-    localStorage.setItem("isAuthenticated", "true");
+    sessionStorage.setItem("isAuthenticated", "true");
   };
   return (
     <div>

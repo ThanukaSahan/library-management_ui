@@ -45,3 +45,15 @@ input {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
+
+table td, table th{
+  height: 50px;
+}
+
+table tr{
+  border-top: #35373b 1px solid;
+}
+
+table td{
+  padding-left: 10px;
+}

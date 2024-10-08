@@ -3,6 +3,7 @@ import Sidebar from "./Sidebar";
 import { Navigate, Route, Router, Routes } from "react-router-dom";
 import Home from "./Home";
 import Author from "./Author";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const MasterPage = () => {
   return (
     <div className="flex flex-row space-x-4">

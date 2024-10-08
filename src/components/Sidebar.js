@@ -1,4 +1,5 @@
 // src/Sidebar.js
+import JWTService from "../common/JWTService ";
 import "../css/Sidebar.css";
 import React, { useState } from "react";
 
@@ -8,18 +9,20 @@ const Sidebar = () => {
   const [openSubMenu, setOpenSubMenu] = useState(null);
   const menuItems = [
     { name: "Home", path: "/" },
-    {
-      name: "Master",
-      path: "#",
-      subMenu: [
-        { name: "Author", path: "/author" },
-        {
-          name: "Category",
+    JWTService.pageAccess("Admin,Manager")
+      ? {
+          name: "Master",
           path: "#",
-        },
-        { name: "Publisher", path: "#" },
-      ],
-    },
+          subMenu: [
+            { name: "Author", path: "/author" },
+            {
+              name: "Category",
+              path: "#",
+            },
+            { name: "Publisher", path: "#" },
+          ],
+        }
+      : [],
     { name: "Settings", path: "#" },
     { name: "Logout", path: "#" },
   ];
@@ -48,37 +51,43 @@ const Sidebar = () => {
         <h1 className="text-2xl font-semibold text-center">My App</h1>
 
         <nav>
-          {menuItems.map((item, index) => (
-            <div key={index}>
-              <a
-                href={item.path}
-                onClick={(e) => {
-                  if (item.subMenu) {
-                    e.preventDefault();
-                    handleSubmenuToggle(index);
-                  }
-                }}
-                className={`text-left flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-white no-underline ${
-                  isOpen ? "justify-left" : "justify-left"
-                }`}
-              >
-                {item.name}
-              </a>
-              {item.subMenu && openSubMenu === index && isOpen && (
-                <div className="ml-8 space-y-2">
-                  {item.subMenu.map((subItem, subIndex) => (
+          {menuItems
+            .filter((item) => item && Object.keys(item).length > 0)
+            .map((item, index) => (
+              <div key={index}>
+                {item ? (
+                  <>
                     <a
-                      href={subItem.path}
-                      key={subIndex}
-                      className="block py-1 px-2 rounded transition duration-200 hover:bg-gray-600 text-white no-underline"
+                      href={item.path}
+                      onClick={(e) => {
+                        if (item.subMenu) {
+                          e.preventDefault();
+                          handleSubmenuToggle(index);
+                        }
+                      }}
+                      className={`text-left flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 text-white no-underline ${
+                        isOpen ? "justify-left" : "justify-left"
+                      }`}
                     >
-                      {subItem.name}
+                      {item.name}
                     </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+                    {item.subMenu && openSubMenu === index && (
+                      <div className="ml-8 space-y-2">
+                        {item.subMenu.map((subItem, subIndex) => (
+                          <a
+                            href={subItem.path}
+                            key={subIndex}
+                            className="block py-1 px-2 rounded transition duration-200 hover:bg-gray-600 text-white no-underline"
+                          >
+                            {subItem.name}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : null}
+              </div>
+            ))}
         </nav>
       </div>
       <div
