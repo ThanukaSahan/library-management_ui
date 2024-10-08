@@ -2,7 +2,7 @@ import "../css/logincss.css";
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import JWTService from "../common/JWTService ";
+import JWTService from "../common/JWTService";
 
 const Login = ({ onLogin }) => {
   const [username, setUserName] = useState("");

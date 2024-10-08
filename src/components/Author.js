@@ -3,8 +3,9 @@ import { faPen } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import JWTService from "../common/JWTService ";
+import JWTService from "../common/JWTService";
 import { useNavigate } from "react-router-dom";
+import ViewAuthor from "./ViewAuthor";
 
 const Author = () => {
   const [name, setName] = useState("");
@@ -16,6 +17,8 @@ const Author = () => {
   const [image64, setImage64] = useState({
     myFile: "",
   });
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [authId, setAuthId] = useState("");
   const navigate = useNavigate();
   useEffect(() => {
     if (!JWTService.pageAccess("Admin,Manager")) {
@@ -110,7 +113,12 @@ const Author = () => {
   };
 
   const handleViewAuthor = async (id) => {
-    debugger;
+    setIsOpenModal(true);
+    setAuthId(id);
+  };
+
+  const handleCloseModal = () => {
+    setIsOpenModal(false);
   };
   return (
     <div>
@@ -227,6 +235,12 @@ const Author = () => {
           </tbody>
         </table>
       </div>
+
+      {isOpenModal && (
+        <>
+          <ViewAuthor id={authId} onCloseModal={handleCloseModal}></ViewAuthor>
+        </>
+      )}
     </div>
   );
 };

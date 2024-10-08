@@ -1,5 +1,5 @@
 // src/Sidebar.js
-import JWTService from "../common/JWTService ";
+import JWTService from "../common/JWTService";
 import "../css/Sidebar.css";
 import React, { useState } from "react";
 
