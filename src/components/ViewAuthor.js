@@ -22,8 +22,6 @@ const ViewAuthor = ({ id, onCloseModal }) => {
         },
       });
       setAuthorObj(response.data);
-      console.log(authorObj);
-      var x = 1;
     } catch (error) {
       debugger;
       if (error.response) {
