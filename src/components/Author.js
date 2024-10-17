@@ -1,11 +1,12 @@
 import { faEye } from "@fortawesome/free-regular-svg-icons";
-import { faPen } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import JWTService from "../common/JWTService";
 import { useNavigate } from "react-router-dom";
 import ViewAuthor from "./ViewAuthor";
+import AppUtility from "../common/AppUtility";
 
 const Author = () => {
   const [name, setName] = useState("");
@@ -20,6 +21,7 @@ const Author = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [authId, setAuthId] = useState("");
   const navigate = useNavigate();
+  const apiUrl = AppUtility.getAPIUrl();
   useEffect(() => {
     if (!JWTService.pageAccess("Admin,Manager")) {
       navigate("/");
@@ -29,14 +31,11 @@ const Author = () => {
   const token = JWTService.getToken();
   const loadAuthorDetails = async (e) => {
     try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/author/AllAuthors`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`${apiUrl}/author/AllAuthors`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setAuthorDetails(response.data);
     } catch (error) {
@@ -49,12 +48,19 @@ const Author = () => {
     }
   };
 
-  const handleSaveNew = async (e) => {
-    debugger;
+  const handleClickSaveButton = (e) => {
     e.preventDefault();
+    debugger;
+    if (authId === null) {
+      handleSaveNew();
+    } else {
+      handleSaveEdit();
+    }
+  };
+  const handleSaveNew = async () => {
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/author/createAuthor`,
+        `${apiUrl}/author/createAuthor`,
         {
           Name: name,
           Email: email,
@@ -82,8 +88,38 @@ const Author = () => {
     }
   };
 
+  const handleSaveEdit = async () => {
+    try {
+      const response = await axios.post(
+        `${apiUrl}/author/upadteAuthor`,
+        {
+          id: authId,
+          Name: name,
+          Email: email,
+          Website: web,
+          Biography: bography,
+          Nationality: nationality,
+          CreateUser: "",
+          Image: image64.myFile,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setAuthorDetails(response.data);
+    } catch (error) {
+      if (error.response) {
+        console.error("Error Data:", error.response.data);
+        console.error("Error Status:", error.response.status);
+      } else {
+        console.error("Error:", error.message);
+      }
+    }
+  };
   const handleUpdateImage = async (e) => {
-    debugger;
     const file = e.target.files[0];
     if (file) {
       const fileSizeInMB = file.size / (1024 * 1024); // Convert bytes to MB
@@ -120,12 +156,64 @@ const Author = () => {
   const handleCloseModal = () => {
     setIsOpenModal(false);
   };
+
+  const handleloadAutor = async (id) => {
+    try {
+      const response = await axios.get(`${apiUrl}/author/getById?id=${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setAuthId(response.data._id);
+      setName(response.data.Name);
+      setEmail(response.data.Email);
+      setWeb(response.data.Website);
+      setNationality(response.data.Nationality);
+      setBiography(response.data.Biography);
+    } catch (error) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          sessionStorage.setItem("isAuthenticated", "false");
+          JWTService.setToken("");
+          navigate("/");
+        }
+      }
+    }
+  };
+
+  const handleDeleteAutor = async (id) => {
+    debugger;
+    try {
+      const response = await axios.post(
+        `${apiUrl}/author/deleteAuthor?id=${id}`,
+        {
+          id: id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      //setAuthorDetails(response.data);
+    } catch (error) {
+      debugger;
+      if (error.response) {
+        if (error.response.status === 401) {
+          sessionStorage.setItem("isAuthenticated", "false");
+          JWTService.setToken("");
+          navigate("/");
+        }
+      }
+    }
+  };
+
   return (
     <div>
       <div>
         <h1>Author</h1>
       </div>
-      <form onSubmit={handleSaveNew}>
+      <form onSubmit={handleClickSaveButton}>
         <div className="w-4/5">
           <div className="flex space-x-4">
             <div className="w-1/2">
@@ -221,13 +309,19 @@ const Author = () => {
                 <td>
                   <FontAwesomeIcon
                     icon={faEye}
-                    className="w-1/2"
+                    className="w-1/3 hover:text-yellow-600"
                     onClick={() => handleViewAuthor(item._id)}
                   />
                   <FontAwesomeIcon
                     icon={faPen}
-                    className="w-1/2"
-                    values={item.id}
+                    className="w-1/3 hover:text-blue-700"
+                    onClick={() => handleloadAutor(item._id)}
+                  />
+
+                  <FontAwesomeIcon
+                    icon={faTrash}
+                    className="w-1/3 hover:text-red-900"
+                    onClick={() => handleDeleteAutor(item._id)}
                   />
                 </td>
               </tr>
